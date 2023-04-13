@@ -4,15 +4,21 @@ import time
 from termcolor import colored
 import MetaTrader5 as mt5
 
-N1 = 10
-N2 = 21
-LOAD = 20
-SYMBOL = "XAUUSD"
-VOLUME = 1.0
+N1 = 10 # parametro indicatore
+N2 = 21 # parametro indicatore
+LOAD = 20 # dati da caricare prima di iniziare a tradare
+SYMBOL = "XAUUSD" # simbolo
+EXCHANGE = "OANDA" # exchange
+SCREENER = "cfd" # screener (tipo di stock)
+INCERTEZZA = 5 # margine di errore sul cross puntino/linea
+TIMEFRAME = "1m" # timeframe
+N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
+RISCHIO = 0.5 # capitale di rischio per ogni operazione
+
+
+GETDATA = 50 
+VOLUME = 1.0 
 DEVIATION = 20
-INCERTEZZA = 5
-TIMEFRAME = "1m"
-GETDATA = 50
 
 # data get fetched in between
 #   10 - 15 sec
@@ -21,8 +27,8 @@ GETDATA = 50
 # Crea un oggetto TA_Handler per la coppia di trading e l'intervallo di tempo specificati
 ta_handler = TA_Handler(
     symbol=SYMBOL,
-    exchange="OANDA",
-    screener="cfd",
+    exchange=EXCHANGE,
+    screener=SCREENER,
     interval=TIMEFRAME,
     timeout=None
 )
@@ -180,11 +186,13 @@ def waiting(timeframe):
     else:
         raise Exception("Timeframe not valid")
          
-
 def calculate_ci(a, b, c):
     if c == 0 :
         return None
     return ( a - b ) / ( 0.015 * c )
+
+def calculate_risk(balance):
+    return ((balance/100)*RISCHIO)/2
 
 close = []
 ema = []
