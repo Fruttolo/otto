@@ -3,8 +3,6 @@ Otto. bot per trading su mt5.
 DA FARE : 
 - array circolari
 - eliminare array superflui
-- ordini a lotti da 10
-- gestione stop loss e stop profit
 
 VERSIONI :
 
