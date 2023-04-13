@@ -6,7 +6,7 @@ import MetaTrader5 as mt5
 
 N1 = 10 # parametro indicatore
 N2 = 21 # parametro indicatore
-LOAD = 20 # dati da caricare prima di iniziare a tradare
+LOAD = 20 # dati da caricare prima di iniziare a tradare (min 6)
 SYMBOL = "XAUUSD" # simbolo
 EXCHANGE = "OANDA" # exchange
 SCREENER = "cfd" # screener (tipo di stock)
@@ -14,10 +14,9 @@ INCERTEZZA = 5 # margine di errore sul cross puntino/linea
 TIMEFRAME = "1m" # timeframe
 N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
 RISCHIO = 0.5 # capitale di rischio per ogni operazione
-
+STOPLOSS = 20 # pips di stop loss iniziale
 
 GETDATA = 50 
-VOLUME = 1.0 
 DEVIATION = 20
 
 # data get fetched in between
@@ -39,6 +38,11 @@ def market_order(symbol, volume, order_type, **kwargs):
 
     order_dict = {'buy': 0, 'sell': 1}
     price_dict = {'buy': tick.ask, 'sell': tick.bid}
+    
+    if(order_type == 'buy'):
+        stopLoss = tick.bid - 2
+    else:
+        stopLoss = tick.bid + 2
 
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
@@ -47,6 +51,7 @@ def market_order(symbol, volume, order_type, **kwargs):
         "type": order_dict[order_type],
         "price": price_dict[order_type],
         "deviation": DEVIATION,
+        "sl": stopLoss,
         "magic": 100,
         "comment": "python market order",
         "type_time": mt5.ORDER_TIME_GTC,
@@ -92,29 +97,12 @@ def close_order(ticket):
 
 def trade(direction):
     color = ''
-    # trading logic
     if direction == 'buy':
         color = 'green'
-        # if we have a BUY signal, close all short positions
-        for pos in mt5.positions_get():
-            if pos.type == 1:  # pos.type == 1 represent a sell order
-                close_order(pos.ticket)
-
-        # if there are no open positions, open a new long position
-        if not mt5.positions_total():
-            market_order(SYMBOL, VOLUME, direction)
-
-    elif direction == 'sell':
+    else:
         color = 'red'
-        # if we have a SELL signal, close all short positions
-        for pos in mt5.positions_get():
-            if pos.type == 0:  # pos.type == 0 represent a buy order
-                close_order(pos.ticket)
-
-        # if there are no open positions, open a new short position
-        if not mt5.positions_total():
-            market_order(SYMBOL, VOLUME, direction)
-            
+    for i in range(N_OPERAZIONI):
+        market_order(SYMBOL, VOLUME, direction)
     print(' >> ',colored(direction,color))
     print()
 
@@ -133,11 +121,11 @@ def calculate_sma(x, y):
         sum = sum + ( x[i] / y )
     return sum
     
-def lastElement(a):
+def lastElement(a, b = 1):
     if len(a) == 0:
         return None
     else:
-        return a[-1]
+        return a[-b]
 
 def calculate_hlc3(market_data):
     return ( market_data.indicators['close'] + market_data.indicators['high'] + market_data.indicators['low'] ) / 3
@@ -192,7 +180,7 @@ def calculate_ci(a, b, c):
     return ( a - b ) / ( 0.015 * c )
 
 def calculate_risk(balance):
-    return ((balance/100)*RISCHIO)/2
+    return  (((balance/100)*RISCHIO)/(STOPLOSS/10))/N_OPERAZIONI
 
 close = []
 ema = []
@@ -203,9 +191,13 @@ tci = []
 wt2 = []
 flag = 0
 data = 0
+loaded = True
 
 os.system("CLS")
 mt5.initialize()
+
+b = mt5.account_info().balance
+VOLUME = round(calculate_risk(b) / 100,2)
 
 while True :
 
@@ -237,15 +229,27 @@ while True :
     print('wt2:', colored(lastElement(wt2),'yellow'))
     print()
 
-    pallino = lastElement(wt2)
-    linea = lastElement(tci)
-
     if data > LOAD :
-        if pallino > linea + INCERTEZZA :
-            signal = 'sell'
-        elif pallino < linea - INCERTEZZA :
-            signal = 'buy'
+        
+        pallino = lastElement(wt2)
+        linea = lastElement(tci)
+        lastPallino = lastElement(wt2,2)
+        lastLinea = lastElement(tci,2)
+        
+        # FIRST TRADE
+        if loaded : 
+            if pallino > linea + INCERTEZZA:
+                trade('sell')
+            elif pallino < linea - INCERTEZZA:
+                trade('buy')
+            loaded = False
+        else:
+            # ALL OTHER TRADE
+            if pallino > linea + INCERTEZZA and lastPallino < lastLinea + INCERTEZZA:
+                trade('sell')
+            elif pallino < linea - INCERTEZZA and lastPallino > lastLinea - INCERTEZZA:
+                trade('buy')
             
-        trade(signal)
+        
     
     time.sleep(4)
