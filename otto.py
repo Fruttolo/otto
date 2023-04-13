@@ -11,7 +11,12 @@ SYMBOL = "XAUUSD"
 VOLUME = 1.0
 DEVIATION = 20
 INCERTEZZA = 5
-TIMEFRAME = "5m"
+TIMEFRAME = "1m"
+GETDATA = 50
+
+# data get fetched in between
+#   10 - 15 sec
+#   40 - 45 sec
 
 # Crea un oggetto TA_Handler per la coppia di trading e l'intervallo di tempo specificati
 ta_handler = TA_Handler(
@@ -137,7 +142,7 @@ def currentTime():
 def wait_min(minutes):
     for i in range(minutes):
         s = time.localtime().tm_sec
-        while not (s < 60 and s > 55):
+        while not (s < GETDATA + 5 and s > GETDATA):
             time.sleep(1)
             s = time.localtime().tm_sec
         if i < minutes - 1:
@@ -149,7 +154,7 @@ def waiting(timeframe):
     if data == 0  :
         print('- SYNCRONIZYNG -','TIMEFRAME:',TIMEFRAME,' -')
         sec = time.localtime().tm_sec
-        while not (sec < 60 and sec > 55):
+        while not (sec < GETDATA + 5 and sec > GETDATA):
             time.sleep(1)
             sec = time.localtime().tm_sec
         return
@@ -198,9 +203,6 @@ while True :
 
     waiting(TIMEFRAME)
 
-    #if ( sec < 60 and sec > 55 ) :
-        #if flag == 0 :
-
     # FETCH MARKET DATA
     market_data = ta_handler.get_analysis()
 
@@ -239,10 +241,3 @@ while True :
         trade(signal)
     
     time.sleep(4)
-
-            #flag = 1
-    #else: 
-        #flag = 0
-
-    #or ( sec < 60 and sec > 55 )
-    #or ( sec < 30 and sec > 25 )
