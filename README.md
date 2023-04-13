@@ -1,14 +1,14 @@
 Otto. bot per trading su mt5.
 
 DA FARE : 
-array circolari
-eliminare array superflui
-ordini a lotti da 10
-gestione stop loss e stop profit
+- array circolari
+- eliminare array superflui
+- ordini a lotti da 10
+- gestione stop loss e stop profit
 
-PROBLEMATICHE :
+VERSIONI :
 
-Alpha
+Alpha problematiche
 
 - tempi di caricamento di avvio
 - stabilità sistema e scalabilità
@@ -18,7 +18,7 @@ Alpha
 	. altri indicatori da seguire
 	. orario apertura e chiusura mercati
 
-Beta
+Beta miglioramenti
 
 + funzione backtesting
 + precisione nei buy / sell
