@@ -5,7 +5,6 @@ import MetaTrader5 as mt5
 
 N1 = 10 # parametro indicatore
 N2 = 21 # parametro indicatore
-LOAD = 10 # dati da caricare prima di iniziare a tradare (min 6)
 SYMBOL = "XAUUSD" # simbolo
 TIMEFRAME = "15m" # timeframe
 N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
