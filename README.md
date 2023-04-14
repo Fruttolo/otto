@@ -11,10 +11,13 @@ HOW TO INSTALL :
 
 ````
 
+````
 DA FARE : 
 - array circolari
 - eliminare array superflui
+````
 
+````
 VERSIONI :
 
 Alpha problematiche
@@ -31,3 +34,4 @@ Beta miglioramenti
 
 + funzione backtesting
 + precisione nei buy / sell
+````
