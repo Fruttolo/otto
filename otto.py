@@ -24,9 +24,9 @@ def market_order(symbol, volume, order_type, **kwargs):
     price_dict = {'buy': tick.ask, 'sell': tick.bid}
     
     if(order_type == 'buy'):
-        stopLoss = tick.bid - 2
+        stopLoss = tick.bid - (STOPLOSS / 10)
     else:
-        stopLoss = tick.bid + 2
+        stopLoss = tick.bid + (STOPLOSS / 10)
 
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
