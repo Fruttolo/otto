@@ -2,7 +2,7 @@ import MetaTrader5 as mt5
 import os
 from termcolor import colored
 
-SPOSTAMENTO_STOPLOSS = 20 # pips di spostamento dello stop loss
+SPOSTAMENTO_STOPLOSS = 30 # pips di spostamento dello stop loss
 
 def modify_order(pos,dir):
     
@@ -40,6 +40,9 @@ def pips(a,b):
 
 mt5.initialize()
 os.system("CLS")
+
+print('-- NOVE -- ')
+print()
 
 while True:
     positions =  mt5.positions_get()
