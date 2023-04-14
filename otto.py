@@ -6,11 +6,11 @@ import MetaTrader5 as mt5
 
 N1 = 10 # parametro indicatore
 N2 = 21 # parametro indicatore
-LOAD = 20 # dati da caricare prima di iniziare a tradare (min 6)
+LOAD = 10 # dati da caricare prima di iniziare a tradare (min 6)
 SYMBOL = "XAUUSD" # simbolo
 EXCHANGE = "OANDA" # exchange
 SCREENER = "cfd" # screener (tipo di stock)
-TIMEFRAME = "1m" # timeframe
+TIMEFRAME = "15m" # timeframe
 N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
 RISCHIO = 0.5 # capitale di rischio per ogni operazione
 STOPLOSS = 20 # pips di stop loss iniziale
@@ -156,21 +156,21 @@ def waiting(timeframe):
     if timeframe == '1m' :
         wait_min(1)
     elif timeframe == '5m':
-        wait_min(60*5)
+        wait_min(5)
     elif timeframe == '15m':
-        wait_min(60*15)
+        wait_min(15)
     elif timeframe == '30m':
-        wait_min(60*30)
+        wait_min(30)
     elif timeframe == '1h':
-        wait_min(60*60)
+        wait_min(60)
     elif timeframe == '2h':
-        wait_min(60*60*2)
+        wait_min(60*2)
     elif timeframe == '4h':
-        wait_min(60*60*4)
+        wait_min(60*4)
     elif timeframe == '1d':
-        wait_min(60*60*24)
+        wait_min(60*24)
     elif timeframe == '1W':
-        wait_min(60*60*24*7)
+        wait_min(60*24*7)
     else:
         raise Exception("Timeframe not valid")
          
