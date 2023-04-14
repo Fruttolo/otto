@@ -169,10 +169,6 @@ mt5.initialize()
 print('-- OTTO -- ',TIMEFRAME)
 print()
 
-
-b = mt5.account_info().balance
-VOLUME = round(calculate_risk(b) / 100,2)
-
 while True:
     
     close = []
@@ -212,6 +208,9 @@ while True:
     linea = lastElement(tci)
     lastPallino = lastElement(wt2,2)
     lastLinea = lastElement(tci,2)
+    
+    b = mt5.account_info().balance
+    VOLUME = round(calculate_risk(b) / 100,2)
     
     # FIRST TRADE
     if loaded : 
