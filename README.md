@@ -3,7 +3,7 @@ Otto. bot per trading su mt5.
 ````
 HOW TO INSTALL :
 
-1. scaricare python
+1. installare python
 2. installare pip
 3. lanciare : "pip install -r requirements.txt"
 4. lanciare : "python otto.py"
