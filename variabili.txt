@@ -1,0 +1,28 @@
+// parametro indicatore tradingview
+N1 = 10 
+
+// parametro indicatore tradingview
+N2 = 21 
+
+// dati da caricare prima di iniziare a tradare (min 6)
+LOAD = 10 
+
+// variabili per cambiare stock
+SYMBOL = "XAUUSD" 
+EXCHANGE = "OANDA"
+SCREENER = "cfd"
+
+// variabile per cambiare timeframe
+TIMEFRAME = "15m"
+
+// Numero di operazioni da aprire quando il pallino passa la linea
+N_OPERAZIONI = 1
+
+// percentuale di richio ogni volta che il pallino passa la linea
+RISCHIO = 0.5 
+
+// quanti pips fissare lo stop loss iniziale
+STOPLOSS = 20
+
+// quanti pips deve spostarsi lo stop loss 
+SPOSTAMENTO_STOPLOSS = 20

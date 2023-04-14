@@ -15,6 +15,7 @@ N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
 RISCHIO = 0.5 # capitale di rischio per ogni operazione
 STOPLOSS = 20 # pips di stop loss iniziale
 
+# VARIABILI DA NON TOCCARE
 GETDATA = 50 
 DEVIATION = 20
 INCERTEZZA = 0
