@@ -1,4 +1,3 @@
-from tradingview_ta import TA_Handler
 import os
 import time
 from termcolor import colored
@@ -8,8 +7,6 @@ N1 = 10 # parametro indicatore
 N2 = 21 # parametro indicatore
 LOAD = 10 # dati da caricare prima di iniziare a tradare (min 6)
 SYMBOL = "XAUUSD" # simbolo
-EXCHANGE = "OANDA" # exchange
-SCREENER = "cfd" # screener (tipo di stock)
 TIMEFRAME = "15m" # timeframe
 N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
 RISCHIO = 0.5 # capitale di rischio per ogni operazione
@@ -19,15 +16,6 @@ STOPLOSS = 30 # pips di stop loss iniziale
 GETDATA = 1000
 DEVIATION = 20
 INCERTEZZA = 0
-
-# Crea un oggetto TA_Handler per la coppia di trading e l'intervallo di tempo specificati
-ta_handler = TA_Handler(
-    symbol=SYMBOL,
-    exchange=EXCHANGE,
-    screener=SCREENER,
-    interval=TIMEFRAME,
-    timeout=None
-)
 
 # function to send a market order
 def market_order(symbol, volume, order_type, **kwargs):
@@ -99,13 +87,13 @@ def wait_min(minutes):
     time.sleep(1)
     if minutes == 1 :
         s = time.localtime().tm_sec
-        while s != 00 :
+        while s != 1 :
             time.sleep(1)
             s = time.localtime().tm_sec
     elif minutes > 1 and minutes < 59 :
         s = time.localtime().tm_sec
         m = time.localtime().tm_min
-        while s != 00 or  m%minutes != 0:
+        while s != 1 or  m%minutes != 0:
             time.sleep(1)
             s = time.localtime().tm_sec
             m = time.localtime().tm_min
@@ -113,7 +101,7 @@ def wait_min(minutes):
         s = time.localtime().tm_sec
         m = time.localtime().tm_min
         h = time.localtime().tm_hour
-        while s != 00 or  m != 0 or h%(minutes/60)!=0 :
+        while s != 1 or  m != 0 or h%(minutes/60)!=0 :
             time.sleep(1)
             s = time.localtime().tm_sec
             m = time.localtime().tm_min
@@ -179,7 +167,7 @@ loaded = True
 os.system("CLS")
 mt5.initialize()
 
-print('-- OTTO -- ')
+print('-- OTTO -- ',TIMEFRAME)
 print()
 
 
