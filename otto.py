@@ -2,14 +2,7 @@ import os
 import time
 from termcolor import colored
 import MetaTrader5 as mt5
-
-N1 = 10 # parametro indicatore
-N2 = 21 # parametro indicatore
-SYMBOL = "XAUUSD" # simbolo
-TIMEFRAME = "15m" # timeframe
-N_OPERAZIONI = 1 # numero di operazioni da fare quando arriva il signal
-RISCHIO = 0.5 # capitale di rischio per ogni operazione
-STOPLOSS = 30 # pips di stop loss iniziale
+from variabili import *
 
 # VARIABILI DA NON TOCCARE
 GETDATA = 1000
