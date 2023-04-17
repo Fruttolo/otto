@@ -63,13 +63,3 @@ while True:
                 if pos.price_current <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                     modify_order(pos,'down')
                     
-        
-
-
-
-        
-        
-        
-    
-    
-#TRADE_ACTION_SLTP
