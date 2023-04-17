@@ -171,7 +171,7 @@ def calculate_risk(balance):
 
 
 data = 0
-loaded = True
+firstOperation = False
 
 os.system("CLS")
 mt5.initialize()
@@ -223,12 +223,12 @@ while True:
     VOLUME = round(calculate_risk(b) / 100,2)
     
     # FIRST TRADE
-    if loaded : 
+    if firstOperation : 
         if pallino > linea + INCERTEZZA:
             trade('sell')
         elif pallino < linea - INCERTEZZA:
             trade('buy')
-        loaded = False
+        firstOperation = False
     else:
         # ALL OTHER TRADE
         if pallino > linea + INCERTEZZA and lastPallino < lastLinea + INCERTEZZA:
