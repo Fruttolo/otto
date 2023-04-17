@@ -5,9 +5,8 @@ HOW TO INSTALL :
 
 1. installare python
 2. installare pip
-3. lanciare : "pip install -r requirements.txt"
-4. lanciare : "python otto.py"
-5. lanciare da un altro terminale : "python nove.py"
+3. installare mt5
+4. aprire otto.bat
 
 ````
 
@@ -22,7 +21,6 @@ VERSIONI :
 
 Alpha problematiche
 
-- tempi di caricamento di avvio
 - stabilità sistema e scalabilità
 - no user interface
 - funzionalità
