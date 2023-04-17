@@ -3,6 +3,7 @@ import time
 from termcolor import colored
 import MetaTrader5 as mt5
 from variabili import *
+import math
 
 # VARIABILI DA NON TOCCARE
 GETDATA = 1000
@@ -10,30 +11,36 @@ DEVIATION = 20
 INCERTEZZA = 0
 
 # function to send a market order
-def market_order(symbol, volume, order_type, **kwargs):
+def market_order(symbol, order_type, tp, **kwargs):
     tick = mt5.symbol_info_tick(symbol)
 
     order_dict = {'buy': 0, 'sell': 1}
     price_dict = {'buy': tick.ask, 'sell': tick.bid}
     
     if(order_type == 'buy'):
-        stopLoss = tick.bid - (STOPLOSS / 10)
+        stopLoss = price_dict[order_type] - (STOPLOSS / 10)
     else:
-        stopLoss = tick.bid + (STOPLOSS / 10)
+        stopLoss = price_dict[order_type] + (STOPLOSS / 10)
 
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": symbol,
-        "volume": volume,
+        "volume": VOLUME,
         "type": order_dict[order_type],
         "price": price_dict[order_type],
         "deviation": DEVIATION,
         "sl": stopLoss,
         "magic": 100,
-        "comment": "python market order",
+        "comment": "apertura ordine",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
     }
+    
+    if tp :
+        if order_type == 'buy' :
+            request['tp'] = (price_dict[order_type] + (BREAK_EVEN / 10))
+        else :
+            request['tp'] = (price_dict[order_type] - (BREAK_EVEN / 10))
 
     order_result = mt5.order_send(request)
     print(order_result)
@@ -41,13 +48,17 @@ def market_order(symbol, volume, order_type, **kwargs):
     return order_result
 
 def trade(direction):
+    count = 0
+    if CHIUSURA_OPERAZIONI_BREAKEVEN > 0 :
+        count = math.ceil( (N_OPERAZIONI / 100) * CHIUSURA_OPERAZIONI_BREAKEVEN )
     color = ''
     if direction == 'buy':
         color = 'green'
     else:
         color = 'red'
     for i in range(N_OPERAZIONI):
-        market_order(SYMBOL, VOLUME, direction)
+        market_order(SYMBOL, direction, count > 0)
+        count = count - 1
     print(' >> ',colored(direction,color))
     print()
 

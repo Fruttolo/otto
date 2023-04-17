@@ -26,7 +26,7 @@ def modify_order(pos,dir):
         "sl": stopLoss,
         "deviation": 20,
         "magic": 100,
-        "comment": "python close order",
+        "comment": "modifica ordine",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_FOK,
         "ENUM_ORDER_STATE": mt5.ORDER_FILLING_RETURN,
