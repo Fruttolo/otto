@@ -5,4 +5,5 @@ TIMEFRAME = "15m" # ----- timeframe
 N_OPERAZIONI = 1 # ----- numero di operazioni da aprire quando arriva il signal
 RISCHIO = 0.5 # capitale ----- di rischio per ogni operazione
 STOPLOSS = 30 # ----- pips di stop loss iniziale
-SPOSTAMENTO_STOPLOSS = 30 # ----- quando il prezzo sale di 30 pips sposto lo stop loss
+SPOSTAMENTO_STOPLOSS = 30 # ----- quando il prezzo sale di 60 pips sposto il take profit di 30 pips
+BREAK_EVEN = 15 # ----- quando il prezzo sale di 15 pips metto a brake even
