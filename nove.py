@@ -1,7 +1,7 @@
 import MetaTrader5 as mt5
 import os
 from termcolor import colored
-from variabili import SPOSTAMENTO_STOPLOSS
+from variabili import SPOSTAMENTO_STOPLOSS, BREAK_EVEN
 
 def modify_order(pos,dir):
     
@@ -50,26 +50,16 @@ while True:
     for pos in positions :
         if pos.type == 0:
             if pos.sl < pos.price_open :
-                if pos.price_current >= pos.price_open + (SPOSTAMENTO_STOPLOSS / 10) :
+                if pos.price_current >= pos.price_open + (BREAK_EVEN / 10) :
                     modify_order(pos,'up')
             else :
                 if pos.price_current >= pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 :
                     modify_order(pos,'up')
         else :
             if pos.sl > pos.price_open :
-                if pos.price_current <= pos.price_open - (SPOSTAMENTO_STOPLOSS / 10) :
+                if pos.price_current <= pos.price_open - (BREAK_EVEN / 10) :
                     modify_order(pos,'down')
             else :
                 if pos.price_current <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                     modify_order(pos,'down')
                     
-        
-
-
-
-        
-        
-        
-    
-    
-#TRADE_ACTION_SLTP
