@@ -78,7 +78,7 @@ def currentTime():
     if h < 10 :
         h = '0'+str(h)
     if m < 10 :
-        m = '0'+str(h)
+        m = '0'+str(m)
     return str(h)+':'+str(m)
 
 def wait_min(minutes):
