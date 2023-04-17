@@ -73,10 +73,16 @@ def lastElement(a, b = 1):
         return a[-b]
 
 def currentTime():
-    return str(time.localtime().tm_hour)+':'+str(time.localtime().tm_min)+':'+str(time.localtime().tm_sec)
+    h = time.localtime().tm_hour
+    m = time.localtime().tm_min
+    if h < 10 :
+        h = '0'+str(h)
+    if m < 10 :
+        m = '0'+str(h)
+    return str(h)+':'+str(m)
 
 def wait_min(minutes):
-    time.sleep(1)
+    time.sleep(5)
     if minutes == 1 :
         s = time.localtime().tm_sec
         while s != 1 :
@@ -187,7 +193,7 @@ while True:
         ema.append(calculate_ema(lastElement(close), lastElement(ema), 20))
         
     print('---',currentTime(),'---',data)
-    print('current price:',colored(lastElement(close),'white'))
+    print('price:',colored(lastElement(close),'white'))
     #print('ema20:', colored(lastElement(ema),'blue'))
     #print('hlc3:', colored(lastElement(hlc3),'white'))
     #print('esa:', colored(lastElement(esa),'red'))
