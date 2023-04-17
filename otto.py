@@ -86,11 +86,14 @@ def lastElement(a, b = 1):
 def currentTime():
     h = time.localtime().tm_hour
     m = time.localtime().tm_min
+    s = time.localtime().tm_sec
     if h < 10 :
         h = '0'+str(h)
     if m < 10 :
         m = '0'+str(m)
-    return str(h)+':'+str(m)
+    if s < 10 :
+        s = '0'+str(s)
+    return str(h)+':'+str(m)+':'+str(s)
 
 def wait_min(minutes):
     time.sleep(5)
