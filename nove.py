@@ -51,14 +51,16 @@ while True:
         if pos.type == 0:
             if pos.sl < pos.price_open :
                 if pos.price_current >= pos.price_open + (BREAK_EVEN / 10) :
-                    modify_order(pos,'up')
+                    if pos.tp == 0 :
+                        modify_order(pos,'up')
             else :
                 if pos.price_current >= pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 :
                     modify_order(pos,'up')
         else :
             if pos.sl > pos.price_open :
                 if pos.price_current <= pos.price_open - (BREAK_EVEN / 10) :
-                    modify_order(pos,'down')
+                    if pos.tp == 0 :
+                        modify_order(pos,'down')
             else :
                 if pos.price_current <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                     modify_order(pos,'down')
