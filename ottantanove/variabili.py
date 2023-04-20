@@ -8,3 +8,5 @@ RISCHIO = 0.5 # ----- capitale di rischio per ogni operazione (per tutte le oper
 STOPLOSS = 30 # ----- pips di stop loss iniziale
 SPOSTAMENTO_STOPLOSS = 20 # ----- quando il prezzo sale di +40 pips sposto il take profit a +20 pips
 BREAK_EVEN = 15 # ----- quando il prezzo sale di 15 pips dal prezzo di apertura metto a brake even
+GETDATA = 1000 # ----- numero di candele passate sul quale calcolare l'indicatore
+DEVIATION = 20 # ----- deviazione quando viene creato un ordine

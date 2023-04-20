@@ -11,22 +11,14 @@ HOW TO INSTALL :
 ````
 
 ````
-DA FARE : 
-- array circolari
-- eliminare array superflui
-````
-
-````
 VERSIONI :
 
 Alpha problematiche
 
-- stabilità sistema e scalabilità
 - no user interface
 - funzionalità
 	. pausa notizie
 	. altri indicatori da seguire
-	. orario apertura e chiusura mercati
 
 Beta miglioramenti
 
