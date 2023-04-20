@@ -174,6 +174,7 @@ def print_candle():
     #print('ci:', colored(ci,'magenta'))
     print('linea:', colored(lastElement(tci),'white'))
     print('pallino:', colored(lastElement(wt2),'yellow'))
+    print('area blu:',colored(lastElement(tci)-lastElement(wt2),'blue'))
     print()
     
 def trade(direction):
