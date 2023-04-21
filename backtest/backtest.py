@@ -10,6 +10,7 @@ class trade_position :
     order_keys = 0
     winning_orders = 0
     zero_order = 0
+    lose_order = 0
     
     def __init__(self, symbol, volume, type, open_price, sl, tp):
         self.ticket = trade_position.order_keys
@@ -200,6 +201,8 @@ def close_order(pos,price) :
         trade_position.winning_orders = trade_position.winning_orders + 1
     if profit == 0 :
         trade_position.zero_order = trade_position.zero_order + 1
+    if profit < 0 :
+        trade_position.lose_order = trade_position.lose_order + 1
     
     global balance
     balance = balance + profit
@@ -207,7 +210,7 @@ def close_order(pos,price) :
     if balance < 0 :
         raise Exception('NON HAI PIU SOLDI !!')
     
-    print("ordine chiuso :",pos.ticket)
+    print("ordine chiuso :",pos.ticket,profit)
     print()
     openTrade.remove(pos)
     if DEBUG :
@@ -411,6 +414,9 @@ for candle in rates :
     
     VOLUME = round(calculate_risk(balance),2)
     
+    if VOLUME < 0.01 :
+        raise Exception('HAI FINITO I SOLDI !!!')
+    
     # SIGNAL LOGIC
     if pallino > linea and lastPallino < lastLinea :
         trade('sell')
@@ -438,7 +444,7 @@ print()
 print('-- WINRATE --')
 print('ordini totali :',trade_position.order_keys)
 print('ordini chiusi in positivo :',colored(trade_position.winning_orders,'green'))
-print('ordini chiusi in negativo :',colored(trade_position.order_keys-trade_position.winning_orders-trade_position.zero_order,'red'))
+print('ordini chiusi in negativo :',colored(trade_position.lose_order,'red'))
 print('ordini chiusi a zero :',colored(trade_position.zero_order,'white'))
 print()
 percent = (trade_position.winning_orders/trade_position.order_keys)*100
