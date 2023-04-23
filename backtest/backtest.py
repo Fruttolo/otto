@@ -22,7 +22,7 @@ class trade_position :
         self.tp = tp
     
     def __str__(self):
-        return "{ "+str(self.ticket)+" "+self.symbol+" "+str(self.volume)+" "+str(self.type)+" "+str(self.open_price)+" "+str(self.sl)+" "+str(self.tp)+" }"
+        return "{ "+str(self.ticket)+" "+self.symbol+" "+str(self.volume)+" "+str(self.type)+" op:"+str(self.open_price)+" sl:"+str(round(self.sl,2))+" tp:"+str(round(self.tp,2))+" }"
 
 
 def timeframe(timeframe):
@@ -97,8 +97,8 @@ def calculate_indicator(cl, high, low):
     wt2.append(calculate_sma(tci,4))
     #ema.append(calculate_ema(lastElement(close), lastElement(ema), 20))
     
-def print_candle():
-    print('--- CANDLE ---',len(close)-GETDATA+1)
+def print_candle(time):
+    print('--- ',datetime.fromtimestamp(time-60*60*2),' ---',len(close)-GETDATA+1)
     print('price:',colored(lastElement(close),'white'))
     #print('ema20:', colored(lastElement(ema),'blue'))
     #print('hlc3:', colored(lastElement(hlc3),'white'))
@@ -117,7 +117,7 @@ def order_send(order):
         if openTrade[i].ticket == order.ticket :
             openTrade[i] = order
             print(order)
-            return "ordine modificato :" + str(order.ticket)
+            return "ordine modificato : " + str(order.ticket)
     openTrade.append(order)
     trade_position.order_keys = trade_position.order_keys + 1
     return order
@@ -148,7 +148,8 @@ def market_order(symbol, order_type, tp):
     )
 
     order_result = order_send(request)
-    print(order_result)
+    if DEBUG :
+        print(order_result)
 
 def modify_order(pos,dir):
     
@@ -162,15 +163,13 @@ def modify_order(pos,dir):
             stopLoss = pos.open_price - 0.1
         else :
             stopLoss = pos.sl - (SPOSTAMENTO_STOPLOSS / 10)
+            print(stopLoss,pos.sl,(SPOSTAMENTO_STOPLOSS / 10))
     
     pos.sl = stopLoss
 
     order_result = order_send(pos)
     print(order_result)
     print()
-    if DEBUG :
-        os.system('pause')
-        print()
     
     
 def trade(direction):
@@ -187,9 +186,6 @@ def trade(direction):
         count = count - 1
     print(' >> ',colored(direction,color))
     print()
-    if DEBUG :
-        os.system('pause')
-        print()
     
 def calculate_risk(b):
     return  ((((b/100)*RISCHIO)/(STOPLOSS/10))/N_OPERAZIONI) / 100
@@ -210,26 +206,34 @@ def close_order(pos,price) :
     if balance < 0 :
         raise Exception('NON HAI PIU SOLDI !!')
     
+    closed = False
+    for i in range(len(openTrade)) :
+        if openTrade[i].ticket == pos.ticket :
+            del openTrade[i]
+            closed = True
+            break
+    if not closed :
+        raise Exception('Trade not found. \n',pos.ticket)
+    #openTrade.remove(pos)
+        
     print("ordine chiuso :",pos.ticket,profit)
-    print()
-    openTrade.remove(pos)
-    if DEBUG :
-        os.system('pause')
-        print()
+    print()   
+    
+    return profit
 
 def detailed_check(pos, timestamp) :
     ticks = mt5.copy_ticks_range(SYMBOL, int(timestamp), int(timestamp+stamp(TIMEFRAME)), mt5.COPY_TICKS_INFO)
     
-    for tick in ticks[:-1] :
+    for tick in ticks :
         if pos.type :
             # SELL
             if pos.tp != 0 :
                 # HA TAKE PROFIT
-                if tick[2] <= pos.tp :
+                if tick[1] <= pos.tp :
                     # TP
                     close_order(pos, pos.tp)
                     return
-                if tick[2] >= pos.sl :
+                if tick[1] >= pos.sl :
                     # SL
                     close_order(pos, pos.sl)
                     return
@@ -237,19 +241,19 @@ def detailed_check(pos, timestamp) :
                 # NON HA TP
                 if pos.sl > pos.open_price :
                     # NON HA ANCORA RAGGIUNTO BE
-                    if tick[2] <= pos.open_price - (BREAK_EVEN / 10) :
+                    if tick[1] <= pos.open_price - (BREAK_EVEN / 10) :
                         # ONLY BE
                         modify_order(pos, 'down')
-                    if tick[2] >= pos.sl :
+                    if tick[1] >= pos.sl :
                         # ONLY SL
                         close_order(pos, pos.sl)
                         return
                 else:
                     # HA GIA RAGGIUNTO BE
-                    if tick[2] <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
+                    if tick[1] <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                         # ONLY BE
                         modify_order(pos, 'down')
-                    if tick[2] >= pos.sl :
+                    if tick[1] >= pos.sl :
                         # ONLY SL
                         close_order(pos, pos.sl)
                         return
@@ -286,6 +290,7 @@ def detailed_check(pos, timestamp) :
                         # ONLY SL
                         close_order(pos, pos.sl)
                         return
+            
 
 mt5.initialize()
 os.system("CLS")
@@ -302,11 +307,16 @@ print()
 
 utc_to =datetime.timestamp(end)
 utc_from =datetime.timestamp(start)
-utc_to = utc_to + 10800
-utc_from = utc_from + 10800
+utc_to = utc_to + 60*60*2
+utc_from = utc_from + 60*60*2
 
 rates = mt5.copy_rates_range(SYMBOL, timeframe(TIMEFRAME), utc_from, utc_to)
 init = mt5.copy_rates_from(SYMBOL, timeframe(TIMEFRAME), utc_from, GETDATA)
+
+if len(init) != GETDATA :
+    raise Exception('Not enough data for indicator. Data =',len(rates))
+if len(rates) == 0 :
+    raise Exception('No candles found.')
 
 close = []
 ema = []
@@ -325,43 +335,54 @@ for candle in init[:-1] :
 
 for candle in rates :
     
+    if DEBUG :
+        for i in openTrade :
+            print(colored(i,'white','on_yellow'))
+    
+    copyOpenTrade = openTrade.copy()
     # MODIFICO ORDINI
-    for pos in openTrade :
+    for pos in copyOpenTrade :
+        high = candle[2]
+        low = candle[3]
         if pos.type :
             # SELL
             if pos.tp != 0 :
                 # HA TAKE PROFIT
-                if candle[2] < pos.sl and candle[3] >= pos.tp :
+                if high < pos.sl and low <= pos.tp :
                     # ONLY TP
                     close_order(pos, pos.tp)
-                if candle[2] >= pos.sl and candle[3] > pos.tp :
+                    continue
+                elif high >= pos.sl and low > pos.tp :
                     # ONLY SL
                     close_order(pos, pos.sl)
-                if candle[2] >= pos.sl and candle[3] <= pos.tp :
+                    continue
+                elif high >= pos.sl and low <= pos.tp :
                     # BOTH
                     detailed_check(pos, candle[0])
             else :
                 # NON HA TP
                 if pos.sl > pos.open_price :
                     # NON HA ANCORA RAGGIUNTO BE
-                    if candle[2] < pos.sl and candle[3] >= pos.open_price - (BREAK_EVEN / 10) :
+                    if high < pos.sl and low <= pos.open_price - (BREAK_EVEN / 10) :
                         # ONLY BE
-                        modify_order(pos, 'down')
-                    if candle[2] >= pos.sl and candle[3] > pos.open_price - (BREAK_EVEN / 10) :
+                        detailed_check(pos, candle[0])
+                    elif high >= pos.sl and low > pos.open_price - (BREAK_EVEN / 10) :
                         # ONLY SL
                         close_order(pos, pos.sl)
-                    if candle[2] >= pos.sl and candle[3] <= pos.open_price - (BREAK_EVEN / 10) :
+                        continue
+                    elif high >= pos.sl and low <= pos.open_price - (BREAK_EVEN / 10) :
                         # BOTH
                         detailed_check(pos, candle[0])
                 else:
                     # HA GIA RAGGIUNTO BE
-                    if candle[2] < pos.sl and candle[3] >= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
+                    if high < pos.sl and low <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                         # ONLY BE
-                        modify_order(pos, 'down')
-                    if candle[2] >= pos.sl and candle[3] > pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
+                        detailed_check(pos, candle[0])
+                    elif high >= pos.sl and low > pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                         # ONLY SL
                         close_order(pos, pos.sl)
-                    if candle[2] >= pos.sl and candle[3] <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
+                        continue
+                    elif high >= pos.sl and low <= pos.sl - (SPOSTAMENTO_STOPLOSS / 10)*2 :
                         # BOTH
                         detailed_check(pos, candle[0])
                 
@@ -369,42 +390,46 @@ for candle in rates :
             # BUY
             if pos.tp != 0 :
                 # HA TAKE PROFIT
-                if candle[2] >= pos.tp and candle[3] > pos.sl :
+                if high >= pos.tp and low > pos.sl :
                     # ONLY TP
                     close_order(pos, pos.tp)
-                if candle[2] < pos.tp and candle[3] <= pos.sl :
+                    continue
+                elif high < pos.tp and low <= pos.sl :
                     # ONLY SL
                     close_order(pos, pos.sl)
-                if candle[2] >= pos.tp and candle[3] <= pos.sl :
+                    continue
+                elif high >= pos.tp and low <= pos.sl :
                     # BOTH
                     detailed_check(pos, candle[0])
             else :
                 # NON HA TP
                 if pos.sl < pos.open_price :
                     # NON HA ANCORA RAGGIUNTO BE
-                    if candle[2] >= pos.open_price + (BREAK_EVEN / 10) and candle[3] > pos.sl :
+                    if high >= pos.open_price + (BREAK_EVEN / 10) and low > pos.sl :
                         # ONLY BE
-                        modify_order(pos, 'up')
-                    if candle[2] < pos.open_price + (BREAK_EVEN / 10) and candle[3] <= pos.sl :
+                        detailed_check(pos, candle[0])
+                    elif high < pos.open_price + (BREAK_EVEN / 10) and low <= pos.sl :
                         # ONLY SL
                         close_order(pos, pos.sl)
-                    if candle[2] >= pos.open_price + (BREAK_EVEN / 10) and candle[3] <= pos.sl :
+                        continue
+                    elif high >= pos.open_price + (BREAK_EVEN / 10) and low <= pos.sl :
                         # BOTH
                         detailed_check(pos, candle[0])
                 else:
                     # HA GIA RAGGIUNTO BE
-                    if candle[2] >= pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 and candle[3] > pos.sl :
+                    if high >= pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 and low > pos.sl :
                         # ONLY S_SL
-                        modify_order(pos, 'up')
-                    if candle[2] < pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 and candle[3] <= pos.sl :
+                        detailed_check(pos, candle[0])
+                    elif high < pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 and low <= pos.sl :
                         # ONLY SL
                         close_order(pos, pos.sl)
-                    if candle[2] >= pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 and candle[3] <= pos.sl :
+                        continue
+                    elif high >= pos.sl + (SPOSTAMENTO_STOPLOSS / 10)*2 and low <= pos.sl :
                         # BOTH
                         detailed_check(pos, candle[0])
     
     calculate_indicator(candle[4],candle[2],candle[3])
-    print_candle()
+    print_candle(candle[0])
     
     # CALCOLO PALLINO LINEA
     pallino = lastElement(wt2)
